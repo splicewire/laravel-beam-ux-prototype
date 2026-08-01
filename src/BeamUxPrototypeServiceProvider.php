@@ -19,7 +19,7 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  *  - registers that audit — ADVISORY — DOWN into beam-core's {@see BeamDoctorManifest}, so one
  *    `splicewire:beam:doctor` run aggregates it (the manifest's first consumer citizen);
  *  - registers an install step DOWN into {@see BeamInstallManifest} (publish tags for the config +
- *    the scaffold stubs), so `beam:install` stamps the starter + nav.ts + convention template;
+ *    the scaffold stubs), so `splicewire:beam:install` stamps the starter + nav.ts + convention template;
  *  - ships the standalone `splicewire:prototype:{doctor,install}` commands.
  *
  * Both manifest registrations are guarded by `bound(...)` (the notifications-twin precedent) so the
@@ -52,7 +52,7 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
     {
         // The scaffold the InstallStep stamps: a starter prototype, the host-owned nav.ts, and the
         // convention TEMPLATE (placeholders intact — `splicewire:prototype:install` binds it to a host
-        // instance; a raw `vendor:publish` cannot substitute, so beam:install lands the template form).
+        // instance; a raw `vendor:publish` cannot substitute, so splicewire:beam:install lands the template form).
         if ($this->app->runningInConsole()) {
             $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'ui/src/_prototype');
 

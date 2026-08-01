@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
  * `php artisan splicewire:prototype:install` — stamp what a package CAN stamp and name what it can't.
  *
  * It (1) publishes the starter prototype + `nav.ts` scaffold stubs (the `beam-ux-prototype-scaffold`
- * tag `beam:install` also runs), and (2) materializes a HOST-BOUND instance of the convention doctrine:
+ * tag `splicewire:beam:install` also runs), and (2) materializes a HOST-BOUND instance of the convention doctrine:
  * it reads the canonical template — preferring the ONE source shipped in the JS package at
  * `ui/node_modules/@splicewire/beam-ux-prototype/convention/…` (falling back to the copy bundled here) —
  * fills the `{{…}}` host placeholders from config, and writes `docs/agents/rushing-prototype.convention.md`.

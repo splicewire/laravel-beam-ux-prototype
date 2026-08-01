@@ -23,7 +23,7 @@ the prototype scaffold into a host, and a standing audit that the host's wiring 
   a **host-bound** instance of the convention doctrine (reads the canonical template shipped in the JS
   package, fills the host placeholders), and prints the manual wiring the doctor checks.
 - **Manifest registrations** — the audit registers **advisory** into `BeamDoctorManifest` (so one
-  `splicewire:beam:doctor` aggregates it) and an install step into `BeamInstallManifest` (so `beam:install`
+  `splicewire:beam:doctor` aggregates it) and an install step into `BeamInstallManifest` (so `splicewire:beam:install`
   stamps the scaffold).
 
 ## Install
