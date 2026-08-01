@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Splicewire\Beam\UxPrototype\Doctor;
 
 use Illuminate\Support\Facades\Process;
@@ -20,7 +18,7 @@ use Rushing\Doctor\DoctorAudit;
  * of `run()` and invoked on-demand by the command's `--boundary` flag, and it does NOT reimplement the
  * check: it shells out to the existing JS `verify-prototype-boundary` bin and maps its exit to a Finding.
  */
-final class PrototypeWiringAudit implements DoctorAudit
+class PrototypeWiringAudit implements DoctorAudit
 {
     public const PACKAGE = '@splicewire/beam-ux-prototype';
 
@@ -28,8 +26,8 @@ final class PrototypeWiringAudit implements DoctorAudit
      * @param  array<string, mixed>  $config  the resolved `beam-ux-prototype` config
      */
     public function __construct(
-        private readonly string $base,
-        private readonly array $config,
+        private string $base,
+        private array $config,
     ) {}
 
     /**

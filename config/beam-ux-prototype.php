@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     /*
      | The host UI package dir, relative to the Laravel base path — the React+Vite estate the
