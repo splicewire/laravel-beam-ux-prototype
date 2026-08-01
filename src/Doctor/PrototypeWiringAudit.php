@@ -6,7 +6,7 @@ namespace Splicewire\Beam\UxPrototype\Doctor;
 
 use Illuminate\Support\Facades\Process;
 use Rushing\Doctor\Finding;
-use Splicewire\Beam\Doctor\DoctorAudit;
+use Rushing\Doctor\DoctorAudit;
 
 /**
  * Report-only audit that a beam host's rushing-prototype wiring is intact (beam-ux-prototype-extract
