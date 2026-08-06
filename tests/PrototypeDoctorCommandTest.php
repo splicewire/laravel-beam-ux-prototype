@@ -7,7 +7,7 @@ use Splicewire\Beam\UxPrototype\Console\PrototypeDoctorCommand;
 use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
 
 /**
- * The standalone `splicewire:prototype:doctor` command: it reports the wiring gaps until the host is
+ * The standalone `splicewire:beam:ux:prototype:doctor` command: it reports the wiring gaps until the host is
  * wired, then passes — the ticket's install→doctor acceptance, exercised through the real command.
  */
 class PrototypeDoctorCommandTest extends TestCase
@@ -24,14 +24,14 @@ class PrototypeDoctorCommandTest extends TestCase
 
     public function test_it_is_registered(): void
     {
-        $this->assertArrayHasKey('splicewire:prototype:doctor', $this->app[Kernel::class]->all());
+        $this->assertArrayHasKey('splicewire:beam:ux:prototype:doctor', $this->app[Kernel::class]->all());
     }
 
     public function test_an_unwired_host_reports_gaps_and_fails(): void
     {
         $this->pointBaseAt(wired: false);
 
-        $this->artisan('splicewire:prototype:doctor')
+        $this->artisan('splicewire:beam:ux:prototype:doctor')
             ->expectsOutputToContain('dependency')
             ->assertExitCode(PrototypeDoctorCommand::FAILURE);
     }
@@ -40,7 +40,7 @@ class PrototypeDoctorCommandTest extends TestCase
     {
         $this->pointBaseAt(wired: true);
 
-        $this->artisan('splicewire:prototype:doctor')->assertExitCode(PrototypeDoctorCommand::SUCCESS);
+        $this->artisan('splicewire:beam:ux:prototype:doctor')->assertExitCode(PrototypeDoctorCommand::SUCCESS);
     }
 
     public function test_beam_doctor_aggregates_the_prototype_audit(): void

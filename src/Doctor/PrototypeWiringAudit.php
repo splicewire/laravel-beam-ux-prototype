@@ -32,7 +32,7 @@ class PrototypeWiringAudit implements DoctorAudit
 
     /**
      * The static wiring checks — all report-only (advisory in the beam:doctor aggregate; the standalone
-     * `splicewire:prototype:doctor` command still fails its own exit code on a Fail).
+     * `splicewire:beam:ux:prototype:doctor` command still fails its own exit code on a Fail).
      *
      * @return list<Finding>
      */

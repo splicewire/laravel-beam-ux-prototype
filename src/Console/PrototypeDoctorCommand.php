@@ -8,7 +8,7 @@ use Rushing\Doctor\Finding;
 use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
 
 /**
- * `php artisan splicewire:prototype:doctor` — audit that the host's rushing-prototype wiring is intact
+ * `php artisan splicewire:beam:ux:prototype:doctor` — audit that the host's rushing-prototype wiring is intact
  * (dep, router glob under a DEV guard, CSS token contract, prod-boundary script). Mirrors
  * `PublishingDoctorCommand` / `CommerceDoctorCommand`: instantiate the audit, render each Finding, fail
  * the exit code on any Fail. Also registered — advisory — into `BeamDoctorManifest` so one
@@ -19,7 +19,7 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  */
 class PrototypeDoctorCommand extends Command
 {
-    protected $signature = 'splicewire:prototype:doctor {--boundary : Also run the prod-boundary build (shells out to verify-prototype-boundary; slow)}';
+    protected $signature = 'splicewire:beam:ux:prototype:doctor {--boundary : Also run the prod-boundary build (shells out to verify-prototype-boundary; slow)}';
 
     protected $description = 'Audit the host rushing-prototype wiring: dependency, router glob + DEV guard, CSS token contract, prod-boundary script.';
 

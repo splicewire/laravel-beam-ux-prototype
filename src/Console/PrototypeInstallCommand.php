@@ -5,7 +5,7 @@ namespace Splicewire\Beam\UxPrototype\Console;
 use Illuminate\Console\Command;
 
 /**
- * `php artisan splicewire:prototype:install` — stamp what a package CAN stamp and name what it can't.
+ * `php artisan splicewire:beam:ux:prototype:install` — stamp what a package CAN stamp and name what it can't.
  *
  * It (1) publishes the starter prototype + `nav.ts` scaffold stubs (the `beam-ux-prototype-scaffold`
  * tag `splicewire:beam:install` also runs), and (2) materializes a HOST-BOUND instance of the convention doctrine:
@@ -18,7 +18,7 @@ use Illuminate\Console\Command;
  */
 class PrototypeInstallCommand extends Command
 {
-    protected $signature = 'splicewire:prototype:install {--force : Overwrite an existing published convention doc / stubs}';
+    protected $signature = 'splicewire:beam:ux:prototype:install {--force : Overwrite an existing published convention doc / stubs}';
 
     protected $description = 'Scaffold the rushing-prototype stubs + a host-bound convention doc, and print the manual wiring the doctor checks.';
 
@@ -42,7 +42,7 @@ class PrototypeInstallCommand extends Command
             'CSS tokens — define the PrototypeDesk token contract in '.config('beam-ux-prototype.tokens_css', 'ui/src/index.css').':root (see the package README table).',
             'Boundary script — add a `verify:prod-boundary` script (invoking `verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'ui/package.json').'.',
         ]);
-        $this->components->info('Then run `php artisan splicewire:prototype:doctor` to confirm the wiring (add `--boundary` for the build check).');
+        $this->components->info('Then run `php artisan splicewire:beam:ux:prototype:doctor` to confirm the wiring (add `--boundary` for the build check).');
 
         return self::SUCCESS;
     }

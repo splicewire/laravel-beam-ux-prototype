@@ -17,8 +17,8 @@ class PackageBootTest extends TestCase
     {
         $all = $this->app[Kernel::class]->all();
 
-        $this->assertArrayHasKey('splicewire:prototype:doctor', $all);
-        $this->assertArrayHasKey('splicewire:prototype:install', $all);
+        $this->assertArrayHasKey('splicewire:beam:ux:prototype:doctor', $all);
+        $this->assertArrayHasKey('splicewire:beam:ux:prototype:install', $all);
     }
 
     public function test_wiring_audit_registers_advisory_into_the_doctor_manifest(): void

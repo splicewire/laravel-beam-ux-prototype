@@ -18,8 +18,8 @@ the prototype scaffold into a host, and a standing audit that the host's wiring 
   - a `verify:prod-boundary` script + a `prototype.outDir` key are wired.
   - **`--boundary` (on-demand):** shells out to the JS `verify-prototype-boundary` bin — the one check
     that needs a bundler. It is **not** reimplemented in PHP.
-- **`splicewire:prototype:doctor`** — runs the audit standalone (fails its exit code on a gap).
-- **`splicewire:prototype:install`** — publishes the starter prototype + `nav.ts` scaffold, materializes
+- **`splicewire:beam:ux:prototype:doctor`** — runs the audit standalone (fails its exit code on a gap).
+- **`splicewire:beam:ux:prototype:install`** — publishes the starter prototype + `nav.ts` scaffold, materializes
   a **host-bound** instance of the convention doctrine (reads the canonical template shipped in the JS
   package, fills the host placeholders), and prints the manual wiring the doctor checks.
 - **Manifest registrations** — the audit registers **advisory** into `BeamDoctorManifest` (so one
@@ -30,8 +30,8 @@ the prototype scaffold into a host, and a standing audit that the host's wiring 
 
 ```bash
 composer require splicewire/laravel-beam-ux-prototype
-php artisan splicewire:prototype:install     # scaffold + host-bound convention doc + wiring checklist
-php artisan splicewire:prototype:doctor       # confirm the wiring (add --boundary for the build check)
+php artisan splicewire:beam:ux:prototype:install     # scaffold + host-bound convention doc + wiring checklist
+php artisan splicewire:beam:ux:prototype:doctor       # confirm the wiring (add --boundary for the build check)
 ```
 
 Config (`config/beam-ux-prototype.php`, publishable) points at the host UI paths (`ui/`, the router file,

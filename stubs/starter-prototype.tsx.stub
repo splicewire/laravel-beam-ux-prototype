@@ -1,7 +1,7 @@
 /**
  * PROTOTYPE — throwaway. Do not ship.
  *
- * Starter prototype stamped by `splicewire:prototype:install` (laravel-beam-ux-prototype). It proves
+ * Starter prototype stamped by `splicewire:beam:ux:prototype:install` (laravel-beam-ux-prototype). It proves
  * the mechanism end-to-end: dropping this file auto-mounts it at `/_prototype/starter` via the host's
  * one-line `createPrototypeRoutes(import.meta.glob(...))` router glob — no router edit.
  *
