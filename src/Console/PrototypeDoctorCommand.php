@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Splicewire\Beam\UxPrototype\Console;
 
 use Illuminate\Console\Command;
-use Rushing\Doctor\DoctorFailed;
+use Rushing\Doctor\Concerns\RunsDoctorFloor;
 use Rushing\Doctor\DoctorRegistration;
 use Rushing\Doctor\DoctorRunner;
-use Rushing\Doctor\DoctorStatus;
-use Rushing\Doctor\Finding;
 use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
 
 /**
@@ -17,7 +15,8 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  * (dep, router glob under a DEV guard, CSS token contract, prod-boundary script). Mirrors
  * `CommerceDoctorCommand`: the wiring audit runs through the shared {@see DoctorRunner} as a gate
  * registration at the `--floor` (default `fail`; particle-doctrine-followups ticket 06), and each
- * Finding renders through this command's own lines — the shared renderer is deliberately not adopted.
+ * Finding renders through {@see RunsDoctorFloor}'s `<check>: <detail>` lines — the same lines this
+ * command always printed; the shared DoctorRenderer is deliberately not adopted.
  * The same audit is also registered — advisory — into `BeamDoctorManifest` so one
  * `splicewire:beam:doctor` run aggregates it with the rest of the family; that is a second COMMAND,
  * not a second report — this command hands the runner only its own registration, never the manifest.
@@ -29,6 +28,8 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  */
 class PrototypeDoctorCommand extends Command
 {
+    use RunsDoctorFloor;
+
     protected $signature = 'splicewire:beam:ux:prototype:doctor
         {--boundary : Also run the prod-boundary build (shells out to verify-prototype-boundary; slow)}
         {--floor=fail : Severity a finding must reach to fail the run (pass|warn|fail)}';
@@ -37,24 +38,15 @@ class PrototypeDoctorCommand extends Command
 
     public function handle(PrototypeWiringAudit $audit, DoctorRunner $runner): int
     {
-        $floor = DoctorStatus::tryFrom(strtolower((string) $this->option('floor')));
+        $floor = $this->parseFloor();
 
         if ($floor === null) {
-            $this->components->error('Invalid --floor value; expected one of: pass, warn, fail.');
-
             return self::FAILURE;
         }
 
-        $failed = false;
-
-        try {
-            $report = $runner->run([
-                new DoctorRegistration('splicewire/laravel-beam-ux-prototype', PrototypeWiringAudit::class, gate: true),
-            ], $floor);
-        } catch (DoctorFailed $failure) {
-            $report = $failure->report;
-            $failed = true;
-        }
+        [$report, $failed] = $this->runAtFloor($runner, [
+            new DoctorRegistration('splicewire/laravel-beam-ux-prototype', PrototypeWiringAudit::class, gate: true),
+        ], $floor);
 
         $findings = $report->findings;
 
@@ -64,9 +56,7 @@ class PrototypeDoctorCommand extends Command
             $failed = $failed || $boundary->status->atLeast($floor);
         }
 
-        foreach ($findings as $finding) {
-            $this->render($finding);
-        }
+        $this->renderFindings($findings);
 
         if ($failed) {
             $this->newLine();
@@ -76,14 +66,5 @@ class PrototypeDoctorCommand extends Command
         }
 
         return self::SUCCESS;
-    }
-
-    private function render(Finding $finding): void
-    {
-        match ($finding->status) {
-            DoctorStatus::Pass => $this->components->info($finding->check.': '.$finding->detail),
-            DoctorStatus::Warn => $this->components->warn($finding->check.': '.$finding->detail),
-            DoctorStatus::Fail => $this->components->error($finding->check.': '.$finding->detail),
-        };
     }
 }
