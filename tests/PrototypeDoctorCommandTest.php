@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
+use Rushing\Doctor\Finding;
 use Splicewire\Beam\UxPrototype\Console\PrototypeDoctorCommand;
 use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
 
@@ -41,6 +44,38 @@ class PrototypeDoctorCommandTest extends TestCase
         $this->pointBaseAt(wired: true);
 
         $this->artisan('splicewire:beam:ux:prototype:doctor')->assertExitCode(PrototypeDoctorCommand::SUCCESS);
+    }
+
+    // ---- --floor (particle-doctrine-followups ticket 06) ----------------------------
+
+    public function test_a_warning_passes_at_the_default_fail_floor(): void
+    {
+        $this->bindWarningAudit();
+
+        $this->artisan('splicewire:beam:ux:prototype:doctor')
+            ->expectsOutputToContain('stub-wiring')
+            ->assertExitCode(PrototypeDoctorCommand::SUCCESS);
+    }
+
+    public function test_a_warning_fails_at_a_warn_floor(): void
+    {
+        $this->bindWarningAudit();
+
+        $this->artisan('splicewire:beam:ux:prototype:doctor', ['--floor' => 'warn'])
+            ->expectsOutputToContain('stub-wiring')
+            ->assertExitCode(PrototypeDoctorCommand::FAILURE);
+    }
+
+    /** Bind a warn-emitting stand-in over the wiring audit so the floor is the only variable. */
+    private function bindWarningAudit(): void
+    {
+        $this->app->instance(PrototypeWiringAudit::class, new class('', []) extends PrototypeWiringAudit
+        {
+            public function run(): array
+            {
+                return [Finding::warn('stub-wiring', 'stub audit is uneasy')];
+            }
+        });
     }
 
     public function test_beam_doctor_aggregates_the_prototype_audit(): void
