@@ -15,8 +15,8 @@ the prototype scaffold into a host, and a standing audit that the host's wiring 
   - `@splicewire/beam-ux-prototype` is a dependency in `ui/package.json`;
   - `createPrototypeRoutes(import.meta.glob(...))` is present under an intact `import.meta.env.DEV` guard;
   - the PrototypeDesk CSS token contract (`--sidebar*`, `--dotted-dot`) is defined in the host `:root`;
-  - a `verify:prod-boundary` script + a `prototype.outDir` key are wired.
-  - **`--boundary` (on-demand):** shells out to the JS `verify-prototype-boundary` bin — the one check
+  - a `beam:verify-prototype-boundary` script + a `prototype.outDir` key are wired.
+  - **`--boundary` (on-demand):** shells out to the JS `beam-verify-prototype-boundary` bin — the one check
     that needs a bundler. It is **not** reimplemented in PHP.
 - **`splicewire:beam:ux:prototype:doctor`** — runs the audit standalone (fails its exit code on a gap).
 - **`splicewire:beam:ux:prototype:install`** — publishes the starter prototype + `nav.ts` scaffold, materializes

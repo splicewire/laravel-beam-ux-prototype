@@ -16,7 +16,7 @@ use Rushing\Doctor\DoctorAudit;
  * `McpIsolationAudit` / publishing's `PublishingReadinessAudit`) — no bundler, no browser. The ONE
  * check that needs a build — the prod-boundary tree-shake proof — is {@see boundaryBuild()}, kept OUT
  * of `run()` and invoked on-demand by the command's `--boundary` flag, and it does NOT reimplement the
- * check: it shells out to the existing JS `verify-prototype-boundary` bin and maps its exit to a Finding.
+ * check: it shells out to the existing JS `beam-verify-prototype-boundary` bin and maps its exit to a Finding.
  */
 class PrototypeWiringAudit implements DoctorAudit
 {
@@ -109,7 +109,7 @@ class PrototypeWiringAudit implements DoctorAudit
             : Finding::fail('css-tokens', 'Missing PrototypeDesk tokens in '.$this->rel($this->str('tokens_css')).': '.implode(', ', $missing).'.');
     }
 
-    /** The `verify:prod-boundary` script + a `prototype.outDir` key are wired in ui/package.json. */
+    /** The `beam:verify-prototype-boundary` script + a `prototype.outDir` key are wired in ui/package.json. */
     private function boundaryScript(?array $pkg): Finding
     {
         if ($pkg === null) {
@@ -117,16 +117,16 @@ class PrototypeWiringAudit implements DoctorAudit
         }
 
         $script = (array) ($pkg['scripts'] ?? []);
-        $hasScript = array_key_exists('verify:prod-boundary', $script);
+        $hasScript = array_key_exists('beam:verify-prototype-boundary', $script);
         $hasOutDir = isset($pkg['prototype']['outDir']);
 
         if ($hasScript && $hasOutDir) {
-            return Finding::pass('boundary-script', '`verify:prod-boundary` script + `prototype.outDir` ('.$pkg['prototype']['outDir'].') are wired.');
+            return Finding::pass('boundary-script', '`beam:verify-prototype-boundary` script + `prototype.outDir` ('.$pkg['prototype']['outDir'].') are wired.');
         }
 
         $gaps = [];
         if (! $hasScript) {
-            $gaps[] = 'a `verify:prod-boundary` script invoking `verify-prototype-boundary`';
+            $gaps[] = 'a `beam:verify-prototype-boundary` script invoking `beam-verify-prototype-boundary`';
         }
         if (! $hasOutDir) {
             $gaps[] = 'a `prototype.outDir` key (the build output the CLI scans)';
@@ -136,7 +136,7 @@ class PrototypeWiringAudit implements DoctorAudit
     }
 
     /**
-     * On-demand: shell out to the JS `verify-prototype-boundary` bin (the ONLY check needing a build)
+     * On-demand: shell out to the JS `beam-verify-prototype-boundary` bin (the ONLY check needing a build)
      * and map its exit/output to a Finding. Not part of {@see run()} — the command opts in via
      * `--boundary`. Never reimplements the walk; the bin is the source of truth.
      */
@@ -148,16 +148,16 @@ class PrototypeWiringAudit implements DoctorAudit
             return Finding::fail('boundary-build', $this->rel($this->str('ui_path')).' is not a directory — cannot run the boundary build.');
         }
 
-        $result = Process::path($ui)->timeout(600)->run((string) ($this->config['boundary_command'] ?? 'npm run verify:prod-boundary'));
+        $result = Process::path($ui)->timeout(600)->run((string) ($this->config['boundary_command'] ?? 'npm run beam:verify-prototype-boundary'));
 
         if ($result->successful()) {
-            return Finding::pass('boundary-build', 'verify-prototype-boundary passed — no prototype code survived the prod build.');
+            return Finding::pass('boundary-build', 'beam-verify-prototype-boundary passed — no prototype code survived the prod build.');
         }
 
         $tail = trim((string) ($result->errorOutput() ?: $result->output()));
         $tail = $tail === '' ? '(no output)' : mb_substr($tail, -400);
 
-        return Finding::fail('boundary-build', 'verify-prototype-boundary failed (exit '.$result->exitCode().'): '.$tail);
+        return Finding::fail('boundary-build', 'beam-verify-prototype-boundary failed (exit '.$result->exitCode().'): '.$tail);
     }
 
     /**

@@ -56,7 +56,7 @@ class PrototypeWiringAuditTest extends TestCase
     {
         file_put_contents($this->base.'/ui/package.json', json_encode([
             'dependencies' => [PrototypeWiringAudit::PACKAGE => '^0.1.0'],
-            'scripts' => ['verify:prod-boundary' => 'verify-prototype-boundary'],
+            'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
             'prototype' => ['outDir' => '../public/ui'],
         ]));
         file_put_contents(
@@ -82,7 +82,7 @@ class PrototypeWiringAuditTest extends TestCase
     {
         $this->writeFullyWiredHost();
         file_put_contents($this->base.'/ui/package.json', json_encode([
-            'scripts' => ['verify:prod-boundary' => 'verify-prototype-boundary'],
+            'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
             'prototype' => ['outDir' => '../public/ui'],
         ]));
 

@@ -14,7 +14,7 @@ use Illuminate\Console\Command;
  * fills the `{{…}}` host placeholders from config, and writes `docs/agents/rushing-prototype.convention.md`.
  *
  * It then prints the manual wiring the doctor audits and no installer can edit for you: the one-line
- * router glob under the DEV guard, the `:root` CSS token block, and the `verify:prod-boundary` script.
+ * router glob under the DEV guard, the `:root` CSS token block, and the `beam:verify-prototype-boundary` script.
  */
 class PrototypeInstallCommand extends Command
 {
@@ -40,7 +40,7 @@ class PrototypeInstallCommand extends Command
         $this->components->bulletList([
             'Router glob — add `...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob(\'../_prototype/**/*.tsx\')) : [])` to '.config('beam-ux-prototype.router', 'ui/src/app/router.tsx').'.',
             'CSS tokens — define the PrototypeDesk token contract in '.config('beam-ux-prototype.tokens_css', 'ui/src/index.css').':root (see the package README table).',
-            'Boundary script — add a `verify:prod-boundary` script (invoking `verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'ui/package.json').'.',
+            'Boundary script — add a `beam:verify-prototype-boundary` script (invoking `beam-verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'ui/package.json').'.',
         ]);
         $this->components->info('Then run `php artisan splicewire:beam:ux:prototype:doctor` to confirm the wiring (add `--boundary` for the build check).');
 

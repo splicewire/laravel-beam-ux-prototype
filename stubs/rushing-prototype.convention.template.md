@@ -20,10 +20,10 @@ governs: a throwaway design prototype under `{{PROTOTYPE_DIR}}/**` — one `<NN>
 trigger: prototyping a UI surface in this repo (a new screen, a redesign, a "what should this look like" question) — author it as a real-React prototype that imports the shipped components, not as bespoke hand-written HTML
 enforcement: advisory             # the read-only rule is convention-stated. The ONE hard seam is the prod-build boundary, checked below.
 enacting-skill: /setup-rushing-prototypes (stands up the mechanism in a repo) + /prototype (authors an individual prototype)
-check: `npm run verify:prod-boundary` stays green — a production build contains no `_prototype` code and no `/_prototype/` route strings; and `git status` after authoring shows ONLY `{{PROTOTYPE_DIR}}/**` touched (the router auto-discovers via `import.meta.glob`, so authoring a prototype edits no real source)
+check: `npm run beam:verify-prototype-boundary` stays green — a production build contains no `_prototype` code and no `/_prototype/` route strings; and `git status` after authoring shows ONLY `{{PROTOTYPE_DIR}}/**` touched (the router auto-discovers via `import.meta.glob`, so authoring a prototype edits no real source)
 status: active
 date: {{DATE}}
-mechanism: "@splicewire/beam-ux-prototype (the repo-agnostic runtime — createPrototypeRoutes, the generic chrome, and the verify-prototype-boundary CLI). This file is a host-bound instance of that package's canonical convention template; the mechanism is the package, not copied-in runtime."
+mechanism: "@splicewire/beam-ux-prototype (the repo-agnostic runtime — createPrototypeRoutes, the generic chrome, and the beam-verify-prototype-boundary CLI). This file is a host-bound instance of that package's canonical convention template; the mechanism is the package, not copied-in runtime."
 related: docs/agents/rushing-prototype.plus.md (the authoring playbook — how to write one fast; this doc is the conformance profile), docs/agents/rehome-ui.convention.md (the downstream twin — where a promoted component lands), docs/adr/0116 (rehome-ui doctrine; Amendment 1 warrants this package's Laravel twin)
 ---
 
@@ -83,8 +83,8 @@ A prototype under `{{PROTOTYPE_DIR}}/` declares itself by carrying, at minimum:
 ## Behavior
 
 - **Prod-exclusion is the one hard seam.** The read-only rule and directory boundary are advisory. The
-  single machine-checked invariant is that prototypes never ship: run `npm run verify:prod-boundary`,
-  which invokes the packaged **`verify-prototype-boundary`** CLI (from `@splicewire/beam-ux-prototype`).
+  single machine-checked invariant is that prototypes never ship: run `npm run beam:verify-prototype-boundary`,
+  which invokes the packaged **`beam-verify-prototype-boundary`** CLI (from `@splicewire/beam-ux-prototype`).
   It builds the production bundle and fails loudly if `_prototype` code or a `/_prototype/` route leaks,
   catching a shipped module importing a prototype or the `import.meta.env.DEV` guard being removed.
 - **The `PrototypeDesk` CSS token contract.** The desk shell ships no stylesheet — it references

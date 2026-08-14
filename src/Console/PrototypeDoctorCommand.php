@@ -21,7 +21,7 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  * `splicewire:beam:doctor` run aggregates it with the rest of the family; that is a second COMMAND,
  * not a second report — this command hands the runner only its own registration, never the manifest.
  *
- * `--boundary` adds the on-demand build check: it shells out to the JS `verify-prototype-boundary` bin
+ * `--boundary` adds the on-demand build check: it shells out to the JS `beam-verify-prototype-boundary` bin
  * (the only check that needs a bundler) and folds its result into the exit code. It stays outside the
  * runner — it is option-gated and produced by a method call, not the audit's `run()` — but honours the
  * same floor.
@@ -31,7 +31,7 @@ class PrototypeDoctorCommand extends Command
     use RunsDoctorFloor;
 
     protected $signature = 'splicewire:beam:ux:prototype:doctor
-        {--boundary : Also run the prod-boundary build (shells out to verify-prototype-boundary; slow)}
+        {--boundary : Also run the prod-boundary build (shells out to beam-verify-prototype-boundary; slow)}
         {--floor=fail : Severity a finding must reach to fail the run (pass|warn|fail)}';
 
     protected $description = 'Audit the host rushing-prototype wiring: dependency, router glob + DEV guard, CSS token contract, prod-boundary script.';

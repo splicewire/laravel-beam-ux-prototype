@@ -9,7 +9,7 @@ return [
 
     /*
      | The host UI package.json — carries the `@splicewire/beam-ux-prototype` dependency, the
-     | `verify:prod-boundary` script, and the `prototype.outDir` key. Relative to the base path.
+     | `beam:verify-prototype-boundary` script, and the `prototype.outDir` key. Relative to the base path.
      */
     'package_json' => 'ui/package.json',
 
@@ -53,5 +53,5 @@ return [
     /*
      | The npm script the boundary build shells out to (on-demand `--boundary` check only).
      */
-    'boundary_command' => 'npm run verify:prod-boundary',
+    'boundary_command' => 'npm run beam:verify-prototype-boundary',
 ];

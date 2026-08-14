@@ -100,7 +100,7 @@ class PrototypeDoctorCommandTest extends TestCase
         if ($wired) {
             file_put_contents($this->fixtureBase.'/ui/package.json', json_encode([
                 'dependencies' => [PrototypeWiringAudit::PACKAGE => '^0.1.0'],
-                'scripts' => ['verify:prod-boundary' => 'verify-prototype-boundary'],
+                'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
                 'prototype' => ['outDir' => '../public/ui'],
             ]));
             file_put_contents(
