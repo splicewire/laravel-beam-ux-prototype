@@ -1,0 +1,26 @@
+/**
+ * PROTOTYPE HOST — the dev-only Inertia page @splicewire/beam-ux-prototype mounts the prototype
+ * gallery inside. Inertia has no top-level client router of its own to spread the glob into
+ * (routing is server-driven, one page component per Laravel route) — so this ONE page owns a small,
+ * NESTED React Router scoped to `/_prototype/*`, using the same
+ * `createPrototypeRoutes(import.meta.glob(...))` mechanism a genuine SPA host spreads into its own
+ * top-level router.
+ *
+ * Stamped by `splicewire:beam:ux:prototype:install` (laravel-beam-ux-prototype) alongside the
+ * matching dev-only `/_prototype/{any?}` Laravel route the package auto-registers — nothing here
+ * needs a manual router edit, unlike a genuine SPA host.
+ */
+import { createPrototypeRoutes } from '@splicewire/beam-ux-prototype';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+
+const router = import.meta.env.DEV
+    ? createBrowserRouter(createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')), {
+          basename: '/_prototype',
+      })
+    : null;
+
+export default function PrototypeHost() {
+    if (!router) return null; // the /_prototype route itself is dev-only (see the Laravel route guard)
+
+    return <RouterProvider router={router} />;
+}

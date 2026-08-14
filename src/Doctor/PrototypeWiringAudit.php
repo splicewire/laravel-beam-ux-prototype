@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype\Doctor;
 
 use Illuminate\Support\Facades\Process;
-use Rushing\Doctor\Finding;
 use Rushing\Doctor\DoctorAudit;
+use Rushing\Doctor\Finding;
 
 /**
  * Report-only audit that a beam host's rushing-prototype wiring is intact (beam-ux-prototype-extract
@@ -76,7 +78,7 @@ class PrototypeWiringAudit implements DoctorAudit
         $withCall = array_filter($carriers, static fn (string $src): bool => str_contains($src, 'createPrototypeRoutes'));
 
         if ($withCall === []) {
-            return Finding::fail('router-glob', 'No `createPrototypeRoutes(...)` call found under '.$this->rel($this->str('ui_path')).'/src — the runtime is installed but not wired.');
+            return Finding::fail('router-glob', 'No `createPrototypeRoutes(...)` call found under '.$this->rel($this->str('src_root')).' — the runtime is installed but not wired.');
         }
 
         foreach ($withCall as $src) {
@@ -142,13 +144,13 @@ class PrototypeWiringAudit implements DoctorAudit
      */
     public function boundaryBuild(): Finding
     {
-        $ui = $this->path($this->str('ui_path'));
+        $root = $this->path($this->str('package_root'));
 
-        if (! is_dir($ui)) {
-            return Finding::fail('boundary-build', $this->rel($this->str('ui_path')).' is not a directory — cannot run the boundary build.');
+        if (! is_dir($root)) {
+            return Finding::fail('boundary-build', $this->rel($this->str('package_root')).' is not a directory — cannot run the boundary build.');
         }
 
-        $result = Process::path($ui)->timeout(600)->run((string) ($this->config['boundary_command'] ?? 'npm run beam:verify-prototype-boundary'));
+        $result = Process::path($root)->timeout(600)->run((string) ($this->config['boundary_command'] ?? 'npm run beam:verify-prototype-boundary'));
 
         if ($result->successful()) {
             return Finding::pass('boundary-build', 'beam-verify-prototype-boundary passed — no prototype code survived the prod build.');
@@ -162,7 +164,7 @@ class PrototypeWiringAudit implements DoctorAudit
 
     /**
      * The router carrier sources to grep: the configured `router` file if present, else every
-     * `.tsx`/`.ts` file under `ui/src` (bounded static scan). Returns file contents.
+     * `.tsx`/`.ts` file under `src_root` (bounded static scan). Returns file contents.
      *
      * @return list<string>
      */
@@ -173,7 +175,7 @@ class PrototypeWiringAudit implements DoctorAudit
             return [$configured];
         }
 
-        $root = $this->path($this->str('ui_path').'/src');
+        $root = $this->path($this->str('src_root'));
         if (! is_dir($root)) {
             return [];
         }

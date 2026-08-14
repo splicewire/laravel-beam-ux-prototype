@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +22,8 @@ class PrototypeWiringAuditTest extends TestCase
     {
         parent::setUp();
         $this->base = sys_get_temp_dir().'/beam-ux-proto-audit-'.uniqid();
-        @mkdir($this->base.'/ui/src/app', 0777, true);
+        @mkdir($this->base.'/resources/js/pages', 0777, true);
+        @mkdir($this->base.'/resources/css', 0777, true);
     }
 
     protected function tearDown(): void
@@ -54,17 +57,17 @@ class PrototypeWiringAuditTest extends TestCase
 
     private function writeFullyWiredHost(): void
     {
-        file_put_contents($this->base.'/ui/package.json', json_encode([
+        file_put_contents($this->base.'/package.json', json_encode([
             'dependencies' => [PrototypeWiringAudit::PACKAGE => '^0.1.0'],
             'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
-            'prototype' => ['outDir' => '../public/ui'],
+            'prototype' => ['outDir' => 'public/build'],
         ]));
         file_put_contents(
-            $this->base.'/ui/src/app/router.tsx',
-            "export const router = createBrowserRouter([\n  ...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')) : []),\n]);\n",
+            $this->base.'/resources/js/pages/_prototype.tsx',
+            "const router = import.meta.env.DEV\n  ? createBrowserRouter(createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')))\n  : null;\n",
         );
         file_put_contents(
-            $this->base.'/ui/src/index.css',
+            $this->base.'/resources/css/app.css',
             ":root {\n --sidebar-deep: #111; --sidebar-foreground: #eee; --sidebar-active-foreground: #fff;\n --sidebar-accent: #222; --sidebar-primary: #3b82f6; --sidebar-avatar: #444; --dotted-dot: #333;\n}\n",
         );
     }
@@ -81,9 +84,9 @@ class PrototypeWiringAuditTest extends TestCase
     public function test_missing_dependency_fails(): void
     {
         $this->writeFullyWiredHost();
-        file_put_contents($this->base.'/ui/package.json', json_encode([
+        file_put_contents($this->base.'/package.json', json_encode([
             'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
-            'prototype' => ['outDir' => '../public/ui'],
+            'prototype' => ['outDir' => 'public/build'],
         ]));
 
         $this->assertSame(DoctorStatus::Fail, $this->finding($this->audit()->run(), 'dependency')->status);
@@ -94,7 +97,7 @@ class PrototypeWiringAuditTest extends TestCase
         $this->writeFullyWiredHost();
         // createPrototypeRoutes present, but the DEV guard stripped — prototypes could leak into prod.
         file_put_contents(
-            $this->base.'/ui/src/app/router.tsx',
+            $this->base.'/resources/js/pages/_prototype.tsx',
             "export const router = createBrowserRouter([\n  ...createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')),\n]);\n",
         );
 
@@ -105,7 +108,7 @@ class PrototypeWiringAuditTest extends TestCase
     public function test_absent_router_glob_fails(): void
     {
         $this->writeFullyWiredHost();
-        file_put_contents($this->base.'/ui/src/app/router.tsx', "export const router = createBrowserRouter([]);\n");
+        file_put_contents($this->base.'/resources/js/pages/_prototype.tsx', "export const router = createBrowserRouter([]);\n");
 
         $this->assertSame(DoctorStatus::Fail, $this->finding($this->audit()->run(), 'router-glob')->status);
     }
@@ -113,7 +116,7 @@ class PrototypeWiringAuditTest extends TestCase
     public function test_missing_css_tokens_fails_and_names_them(): void
     {
         $this->writeFullyWiredHost();
-        file_put_contents($this->base.'/ui/src/index.css', ":root { --sidebar-deep: #111; }\n");
+        file_put_contents($this->base.'/resources/css/app.css', ":root { --sidebar-deep: #111; }\n");
 
         $finding = $this->finding($this->audit()->run(), 'css-tokens');
         $this->assertSame(DoctorStatus::Fail, $finding->status);
@@ -123,7 +126,7 @@ class PrototypeWiringAuditTest extends TestCase
     public function test_missing_boundary_script_or_outdir_fails(): void
     {
         $this->writeFullyWiredHost();
-        file_put_contents($this->base.'/ui/package.json', json_encode([
+        file_put_contents($this->base.'/package.json', json_encode([
             'dependencies' => [PrototypeWiringAudit::PACKAGE => '^0.1.0'],
             // no scripts, no prototype.outDir
         ]));

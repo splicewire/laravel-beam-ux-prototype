@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype;
 
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Splicewire\Beam\Doctor\BeamDoctorManifest;
@@ -20,10 +24,15 @@ use Splicewire\Beam\UxPrototype\Doctor\PrototypeWiringAudit;
  *    `splicewire:beam:doctor` run aggregates it (the manifest's first consumer citizen);
  *  - registers an install step DOWN into {@see BeamInstallManifest} (publish tags for the config +
  *    the scaffold stubs), so `splicewire:beam:install` stamps the starter + nav.ts + convention template;
+ *  - for the monolith default (`register_route`, Inertia installed): also publishes the
+ *    `_prototype.tsx` Inertia host page and auto-registers the dev-only `/_prototype/{any?}` route —
+ *    Inertia has no top-level client router of its own to spread the glob into, so this ONE net-new
+ *    page + route is the package's job, unlike the router-glob edit a genuine SPA host makes by hand;
  *  - ships the standalone `splicewire:beam:ux:prototype:{doctor,install}` commands.
  *
  * Both manifest registrations are guarded by `bound(...)` (the notifications-twin precedent) so the
- * package still boots in a host that predates the manifests.
+ * package still boots in a host that predates the manifests. `inertiajs/inertia-laravel` is never a
+ * hard dependency — the route registration is `class_exists()`-gated, a no-op for a genuine SPA host.
  */
 class BeamUxPrototypeServiceProvider extends PackageServiceProvider
 {
@@ -50,17 +59,47 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        // The scaffold the InstallStep stamps: a starter prototype, the host-owned nav.ts, and the
+        // The scaffold the InstallStep stamps: a starter prototype, the host-owned nav.ts, the
         // convention TEMPLATE (placeholders intact — `splicewire:beam:ux:prototype:install` binds it to a host
-        // instance; a raw `vendor:publish` cannot substitute, so splicewire:beam:install lands the template form).
+        // instance; a raw `vendor:publish` cannot substitute, so splicewire:beam:install lands the template form),
+        // and — monolith shape only (`register_route`) — the Inertia prototype-host page. That last
+        // one is a net-new file, not an edit to host code, so it's safe to auto-stamp like the rest;
+        // a genuine SPA host (register_route: false) wires its own top-level router by hand instead.
         if ($this->app->runningInConsole()) {
-            $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'ui/src/_prototype');
+            $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'resources/js/_prototype');
 
-            $this->publishes([
+            $publishes = [
                 __DIR__.'/../stubs/starter-prototype.tsx.stub' => $this->app->basePath($prototypeDir.'/starter/01-starter.tsx'),
                 __DIR__.'/../stubs/nav.ts.stub' => $this->app->basePath($prototypeDir.'/_chrome/nav.ts'),
                 __DIR__.'/../stubs/rushing-prototype.convention.template.md' => $this->app->basePath('docs/agents/rushing-prototype.convention.template.md'),
-            ], 'beam-ux-prototype-scaffold');
+            ];
+
+            if ((bool) config('beam-ux-prototype.register_route', true)) {
+                $routerPath = (string) config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+                $publishes[__DIR__.'/../stubs/prototype-host.tsx.stub'] = $this->app->basePath($routerPath);
+            }
+
+            $this->publishes($publishes, 'beam-ux-prototype-scaffold');
+        }
+
+        // Monolith shape only, and only if the host actually has Inertia installed: the dev-only
+        // `/_prototype/{any?}` route Inertia's own routing has no reason to know about otherwise.
+        // Gated on the environment, not just APP_DEBUG, so a misconfigured prod box doesn't expose it.
+        if (
+            (bool) config('beam-ux-prototype.register_route', true)
+            && class_exists(Inertia::class)
+            && $this->app->environment('local')
+        ) {
+            // Derived from `router`, not a separate config key — Inertia resolves a page by its path
+            // under {src_root}/pages/ minus the extension, so this stays correct for free if a host
+            // ever repoints `router` (e.g. a different pages/ subdir).
+            $pagesRoot = rtrim((string) config('beam-ux-prototype.src_root', 'resources/js'), '/').'/pages/';
+            $router = (string) config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+            $page = str_starts_with($router, $pagesRoot)
+                ? preg_replace('/\.tsx?$/', '', substr($router, strlen($pagesRoot)))
+                : '_prototype';
+
+            Route::get('/_prototype/{any?}', fn () => Inertia::render($page))->where('any', '.*');
         }
 
         // Register the wiring audit (advisory) DOWN into the beam-doctor aggregation manifest.

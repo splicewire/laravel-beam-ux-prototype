@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype\Tests;
 
 use Illuminate\Contracts\Console\Kernel;

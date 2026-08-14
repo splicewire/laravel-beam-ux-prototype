@@ -95,24 +95,25 @@ class PrototypeDoctorCommandTest extends TestCase
     private function pointBaseAt(bool $wired): void
     {
         $this->fixtureBase = sys_get_temp_dir().'/beam-ux-proto-cmd-'.uniqid();
-        @mkdir($this->fixtureBase.'/ui/src/app', 0777, true);
+        @mkdir($this->fixtureBase.'/resources/js/pages', 0777, true);
+        @mkdir($this->fixtureBase.'/resources/css', 0777, true);
 
         if ($wired) {
-            file_put_contents($this->fixtureBase.'/ui/package.json', json_encode([
+            file_put_contents($this->fixtureBase.'/package.json', json_encode([
                 'dependencies' => [PrototypeWiringAudit::PACKAGE => '^0.1.0'],
                 'scripts' => ['beam:verify-prototype-boundary' => 'beam-verify-prototype-boundary'],
-                'prototype' => ['outDir' => '../public/ui'],
+                'prototype' => ['outDir' => 'public/build'],
             ]));
             file_put_contents(
-                $this->fixtureBase.'/ui/src/app/router.tsx',
+                $this->fixtureBase.'/resources/js/pages/_prototype.tsx',
                 "...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')) : [])\n",
             );
             file_put_contents(
-                $this->fixtureBase.'/ui/src/index.css',
+                $this->fixtureBase.'/resources/css/app.css',
                 ":root { --sidebar-deep:#111;--sidebar-foreground:#eee;--sidebar-active-foreground:#fff;--sidebar-accent:#222;--sidebar-primary:#3b82f6;--sidebar-avatar:#444;--dotted-dot:#333; }\n",
             );
         } else {
-            file_put_contents($this->fixtureBase.'/ui/package.json', json_encode(['dependencies' => []]));
+            file_put_contents($this->fixtureBase.'/package.json', json_encode(['dependencies' => []]));
         }
 
         $this->app->setBasePath($this->fixtureBase);

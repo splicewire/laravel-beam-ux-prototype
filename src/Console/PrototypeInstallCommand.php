@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Splicewire\Beam\UxPrototype\Console;
 
 use Illuminate\Console\Command;
+use Splicewire\Beam\UxPrototype\BeamUxPrototypeServiceProvider;
 
 /**
  * `php artisan splicewire:beam:ux:prototype:install` — stamp what a package CAN stamp and name what it can't.
@@ -10,11 +13,14 @@ use Illuminate\Console\Command;
  * It (1) publishes the starter prototype + `nav.ts` scaffold stubs (the `beam-ux-prototype-scaffold`
  * tag `splicewire:beam:install` also runs), and (2) materializes a HOST-BOUND instance of the convention doctrine:
  * it reads the canonical template — preferring the ONE source shipped in the JS package at
- * `ui/node_modules/@splicewire/beam-ux-prototype/convention/…` (falling back to the copy bundled here) —
- * fills the `{{…}}` host placeholders from config, and writes `docs/agents/rushing-prototype.convention.md`.
+ * `{package_root}/node_modules/@splicewire/beam-ux-prototype/convention/…` (falling back to the copy
+ * bundled here) — fills the `{{…}}` host placeholders from config, and writes
+ * `docs/agents/rushing-prototype.convention.md`.
  *
- * It then prints the manual wiring the doctor audits and no installer can edit for you: the one-line
- * router glob under the DEV guard, the `:root` CSS token block, and the `beam:verify-prototype-boundary` script.
+ * For the monolith default (Inertia, no top-level client router of its own), the router glob is also
+ * stamped/auto-registered — see {@see BeamUxPrototypeServiceProvider}.
+ * What's left manual either way: the `:root` CSS token block and the `beam:verify-prototype-boundary`
+ * script — both printed here, and both audited by the doctor.
  */
 class PrototypeInstallCommand extends Command
 {
@@ -37,10 +43,16 @@ class PrototypeInstallCommand extends Command
 
         $this->newLine();
         $this->components->warn('Manual wiring a package cannot edit for you (the doctor audits each):');
+
+        $routerPath = config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+        $routerLine = (bool) config('beam-ux-prototype.register_route', true)
+            ? "Router glob — auto-wired: `{$routerPath}` (published) + the dev-only `/_prototype/{any?}` Inertia route (auto-registered) mount the gallery. Nothing to edit."
+            : "Router glob — add `...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')) : [])` to {$routerPath}.";
+
         $this->components->bulletList([
-            'Router glob — add `...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob(\'../_prototype/**/*.tsx\')) : [])` to '.config('beam-ux-prototype.router', 'ui/src/app/router.tsx').'.',
-            'CSS tokens — define the PrototypeDesk token contract in '.config('beam-ux-prototype.tokens_css', 'ui/src/index.css').':root (see the package README table).',
-            'Boundary script — add a `beam:verify-prototype-boundary` script (invoking `beam-verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'ui/package.json').'.',
+            $routerLine,
+            'CSS tokens — define the PrototypeDesk token contract in '.config('beam-ux-prototype.tokens_css', 'resources/js/app.css').':root (see the package README table).',
+            'Boundary script — add a `beam:verify-prototype-boundary` script (invoking `beam-verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'package.json').'.',
         ]);
         $this->components->info('Then run `php artisan splicewire:beam:ux:prototype:doctor` to confirm the wiring (add `--boundary` for the build check).');
 
@@ -53,8 +65,9 @@ class PrototypeInstallCommand extends Command
      */
     private function materializeConvention(string $base, bool $force): void
     {
-        $ui = (string) config('beam-ux-prototype.ui_path', 'ui');
-        $jsSource = $base.'/'.$ui.'/node_modules/@splicewire/beam-ux-prototype/convention/rushing-prototype.convention.template.md';
+        $root = rtrim((string) config('beam-ux-prototype.package_root', '.'), '/');
+        $nodeModules = $root === '.' ? 'node_modules' : "{$root}/node_modules";
+        $jsSource = $base.'/'.$nodeModules.'/@splicewire/beam-ux-prototype/convention/rushing-prototype.convention.template.md';
         $bundled = __DIR__.'/../../stubs/rushing-prototype.convention.template.md';
 
         $templatePath = is_file($jsSource) ? $jsSource : $bundled;
@@ -66,7 +79,7 @@ class PrototypeInstallCommand extends Command
             return;
         }
 
-        $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'ui/src/_prototype');
+        $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'resources/js/_prototype');
         $bound = strtr($template, [
             '{{PROTOTYPE_DIR}}' => $prototypeDir,
             '{{BRAND_IMPORT}}' => (string) config('beam-ux-prototype.brand_import', '@/components/brand/BrandLockup'),

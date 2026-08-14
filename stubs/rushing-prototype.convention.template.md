@@ -78,7 +78,10 @@ A prototype under `{{PROTOTYPE_DIR}}/` declares itself by carrying, at minimum:
   backend. *In-shell* (high-fidelity): mount inside the real app shell via a dev login against a seeded
   tenant, for surfaces whose point is the shell/nav/IA framing.
 - **Route placement — automatic.** There is nothing to add: the `import.meta.glob` discovery mounts the
-  file on sight. The router is edited exactly ONCE (to install the glob), never again per prototype.
+  file on sight. The router is edited exactly ONCE (to install the glob), never again per prototype —
+  and for a Laravel-Inertia host (the norm), not even that once: `laravel-beam-ux-prototype` stamps a
+  small nested router + auto-registers the dev-only route, since Inertia has no top-level client
+  router of its own to spread the glob into. Only a genuine standalone SPA host edits a router by hand.
 
 ## Behavior
 
