@@ -14,7 +14,7 @@ import { createPrototypeRoutes } from '@splicewire/beam-ux-prototype';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
 const router = import.meta.env.DEV
-    ? createBrowserRouter(createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')), {
+    ? createBrowserRouter(createPrototypeRoutes(import.meta.glob<Record<string, unknown>>('../_prototype/**/*.tsx')), {
           basename: '/_prototype',
       })
     : null;
