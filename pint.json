@@ -1,6 +1,9 @@
 {
     "preset": "laravel",
     "rules": {
+        "fully_qualified_strict_types": {
+            "phpdoc_tags": []
+        },
         "declare_strict_types": true,
         "ordered_imports": true,
         "trailing_comma_in_multiline": true
