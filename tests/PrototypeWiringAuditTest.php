@@ -34,7 +34,7 @@ class PrototypeWiringAuditTest extends TestCase
 
     private function config(): array
     {
-        return require __DIR__.'/../config/beam-ux-prototype.php';
+        return require __DIR__.'/../config/beam/ux-prototype.php';
     }
 
     private function audit(): PrototypeWiringAudit

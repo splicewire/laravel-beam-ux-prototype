@@ -40,7 +40,7 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-beam-ux-prototype')
-            ->hasConfigFile('beam-ux-prototype')
+            ->hasConfigFile('beam/ux-prototype')
             ->hasCommands([
                 PrototypeDoctorCommand::class,
                 PrototypeInstallCommand::class,
@@ -53,7 +53,7 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
         // can `make()` it with no per-check wiring in the aggregating command.
         $this->app->bind(PrototypeWiringAudit::class, fn ($app) => new PrototypeWiringAudit(
             $app->basePath(),
-            (array) config('beam-ux-prototype', []),
+            (array) config('beam.ux-prototype', []),
         ));
     }
 
@@ -66,7 +66,7 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
         // one is a net-new file, not an edit to host code, so it's safe to auto-stamp like the rest;
         // a genuine SPA host (register_route: false) wires its own top-level router by hand instead.
         if ($this->app->runningInConsole()) {
-            $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'resources/js/_prototype');
+            $prototypeDir = (string) config('beam.ux-prototype.prototype_dir', 'resources/js/_prototype');
 
             $publishes = [
                 __DIR__.'/../stubs/starter-prototype.tsx.stub' => $this->app->basePath($prototypeDir.'/starter/01-starter.tsx'),
@@ -74,8 +74,8 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
                 __DIR__.'/../stubs/rushing-prototype.convention.template.md' => $this->app->basePath('docs/agents/rushing-prototype.convention.template.md'),
             ];
 
-            if ((bool) config('beam-ux-prototype.register_route', true)) {
-                $routerPath = (string) config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+            if ((bool) config('beam.ux-prototype.register_route', true)) {
+                $routerPath = (string) config('beam.ux-prototype.router', 'resources/js/pages/_prototype.tsx');
                 $publishes[__DIR__.'/../stubs/prototype-host.tsx.stub'] = $this->app->basePath($routerPath);
             }
 
@@ -86,15 +86,15 @@ class BeamUxPrototypeServiceProvider extends PackageServiceProvider
         // `/_prototype/{any?}` route Inertia's own routing has no reason to know about otherwise.
         // Gated on the environment, not just APP_DEBUG, so a misconfigured prod box doesn't expose it.
         if (
-            (bool) config('beam-ux-prototype.register_route', true)
+            (bool) config('beam.ux-prototype.register_route', true)
             && class_exists(Inertia::class)
             && $this->app->environment('local')
         ) {
             // Derived from `router`, not a separate config key — Inertia resolves a page by its path
             // under {src_root}/pages/ minus the extension, so this stays correct for free if a host
             // ever repoints `router` (e.g. a different pages/ subdir).
-            $pagesRoot = rtrim((string) config('beam-ux-prototype.src_root', 'resources/js'), '/').'/pages/';
-            $router = (string) config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+            $pagesRoot = rtrim((string) config('beam.ux-prototype.src_root', 'resources/js'), '/').'/pages/';
+            $router = (string) config('beam.ux-prototype.router', 'resources/js/pages/_prototype.tsx');
             $page = str_starts_with($router, $pagesRoot)
                 ? preg_replace('/\.tsx?$/', '', substr($router, strlen($pagesRoot)))
                 : '_prototype';

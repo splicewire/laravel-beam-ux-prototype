@@ -25,7 +25,7 @@ class PrototypeWiringAudit implements DoctorAudit
     public const PACKAGE = '@splicewire/beam-ux-prototype';
 
     /**
-     * @param  array<string, mixed>  $config  the resolved `beam-ux-prototype` config
+     * @param  array<string, mixed>  $config  the resolved `beam.ux-prototype` config
      */
     public function __construct(
         private string $base,

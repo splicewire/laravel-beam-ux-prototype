@@ -16,7 +16,7 @@ class PrototypeRouteRegistrationDisabledTest extends TestCase
     protected function defineEnvironment($app): void
     {
         parent::defineEnvironment($app);
-        $app['config']->set('beam-ux-prototype.register_route', false);
+        $app['config']->set('beam.ux-prototype.register_route', false);
     }
 
     public function test_no_route_is_registered_when_register_route_is_disabled(): void

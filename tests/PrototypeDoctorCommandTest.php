@@ -120,7 +120,7 @@ class PrototypeDoctorCommandTest extends TestCase
         // Rebind the audit so it reads the fixture base (the binding closure captured the real base).
         $this->app->bind(PrototypeWiringAudit::class, fn ($app) => new PrototypeWiringAudit(
             $this->fixtureBase,
-            (array) config('beam-ux-prototype', []),
+            (array) config('beam.ux-prototype', []),
         ));
     }
 

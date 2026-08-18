@@ -44,15 +44,15 @@ class PrototypeInstallCommand extends Command
         $this->newLine();
         $this->components->warn('Manual wiring a package cannot edit for you (the doctor audits each):');
 
-        $routerPath = config('beam-ux-prototype.router', 'resources/js/pages/_prototype.tsx');
-        $routerLine = (bool) config('beam-ux-prototype.register_route', true)
+        $routerPath = config('beam.ux-prototype.router', 'resources/js/pages/_prototype.tsx');
+        $routerLine = (bool) config('beam.ux-prototype.register_route', true)
             ? "Router glob — auto-wired: `{$routerPath}` (published) + the dev-only `/_prototype/{any?}` Inertia route (auto-registered) mount the gallery. Nothing to edit."
             : "Router glob — add `...(import.meta.env.DEV ? createPrototypeRoutes(import.meta.glob('../_prototype/**/*.tsx')) : [])` to {$routerPath}.";
 
         $this->components->bulletList([
             $routerLine,
-            'CSS tokens — define the PrototypeDesk token contract in '.config('beam-ux-prototype.tokens_css', 'resources/js/app.css').':root (see the package README table).',
-            'Boundary script — add a `beam:verify-prototype-boundary` script (invoking `beam-verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam-ux-prototype.package_json', 'package.json').'.',
+            'CSS tokens — define the PrototypeDesk token contract in '.config('beam.ux-prototype.tokens_css', 'resources/js/app.css').':root (see the package README table).',
+            'Boundary script — add a `beam:verify-prototype-boundary` script (invoking `beam-verify-prototype-boundary`) + a `prototype.outDir` key to '.config('beam.ux-prototype.package_json', 'package.json').'.',
         ]);
         $this->components->info('Then run `php artisan splicewire:beam:ux:prototype:doctor` to confirm the wiring (add `--boundary` for the build check).');
 
@@ -65,7 +65,7 @@ class PrototypeInstallCommand extends Command
      */
     private function materializeConvention(string $base, bool $force): void
     {
-        $root = rtrim((string) config('beam-ux-prototype.package_root', '.'), '/');
+        $root = rtrim((string) config('beam.ux-prototype.package_root', '.'), '/');
         $nodeModules = $root === '.' ? 'node_modules' : "{$root}/node_modules";
         $jsSource = $base.'/'.$nodeModules.'/@splicewire/beam-ux-prototype/convention/rushing-prototype.convention.template.md';
         $bundled = __DIR__.'/../../stubs/rushing-prototype.convention.template.md';
@@ -79,10 +79,10 @@ class PrototypeInstallCommand extends Command
             return;
         }
 
-        $prototypeDir = (string) config('beam-ux-prototype.prototype_dir', 'resources/js/_prototype');
+        $prototypeDir = (string) config('beam.ux-prototype.prototype_dir', 'resources/js/_prototype');
         $bound = strtr($template, [
             '{{PROTOTYPE_DIR}}' => $prototypeDir,
-            '{{BRAND_IMPORT}}' => (string) config('beam-ux-prototype.brand_import', '@/components/brand/BrandLockup'),
+            '{{BRAND_IMPORT}}' => (string) config('beam.ux-prototype.brand_import', '@/components/brand/BrandLockup'),
             '{{DATE}}' => date('Y-m-d'),
             // relative form used inside the glob string in the doc body
             '{{PROTOTYPE_DIR relative}}' => '../_prototype',
