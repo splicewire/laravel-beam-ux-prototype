@@ -21,6 +21,13 @@ use Splicewire\Beam\UxPrototype\BeamUxPrototypeServiceProvider;
  * stamped/auto-registered — see {@see BeamUxPrototypeServiceProvider}.
  * What's left manual either way: the `:root` CSS token block and the `beam:verify-prototype-boundary`
  * script — both printed here, and both audited by the doctor.
+ *
+ * **No `--travel=`, deliberately** (beam-facade ticket 117). The ticket named this command alongside the
+ * satellite / tower / commerce installers as an arm to cascade the lever to, and measurement says it has
+ * nothing to cascade: this package ships **no migrations at all** — the `beam-ux-prototype-scaffold` tag
+ * publishes a starter prototype, a `nav.ts` and a convention doc, none of which the migrator ever sees.
+ * A `--travel=` here would be an option over an empty set. Add one the day this package publishes a
+ * migration, and not before.
  */
 class PrototypeInstallCommand extends Command
 {
