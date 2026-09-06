@@ -11,16 +11,32 @@
  * needs a manual router edit, unlike a genuine SPA host.
  */
 import { createPrototypeRoutes } from '@splicewire/beam-ux-prototype';
+import { useSyncExternalStore } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
-const router = import.meta.env.DEV
-    ? createBrowserRouter(createPrototypeRoutes(import.meta.glob<Record<string, unknown>>('../_prototype/**/*.tsx')), {
-          basename: '/_prototype',
-      })
-    : null;
+// The package emits absolute /_prototype paths; adding a basename would prefix them twice.
+const router =
+    import.meta.env.DEV && typeof document !== 'undefined'
+        ? createBrowserRouter(
+              createPrototypeRoutes(
+                  import.meta.glob<Record<string, unknown>>(
+                      '../_prototype/**/*.tsx',
+                  ),
+              ),
+          )
+        : null;
+
+const subscribe = () => () => undefined;
 
 export default function PrototypeHost() {
-    if (!router) return null; // the /_prototype route itself is dev-only (see the Laravel route guard)
+    // Match the empty server render during hydration, then mount the browser-only gallery.
+    const isClient = useSyncExternalStore(
+        subscribe,
+        () => true,
+        () => false,
+    );
+
+    if (!isClient || !router) return null;
 
     return <RouterProvider router={router} />;
 }
