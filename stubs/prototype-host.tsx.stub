@@ -36,7 +36,9 @@ export default function PrototypeHost() {
         () => false,
     );
 
-    if (!isClient || !router) return null;
+    if (!isClient || !router) {
+        return null;
+    }
 
     return <RouterProvider router={router} />;
 }
